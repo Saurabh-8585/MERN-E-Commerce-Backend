@@ -63,4 +63,5 @@ router.post('/fetchproduct/category', async (req, res) => {
     }
 })
 
+
 module.exports = router
