@@ -9,6 +9,7 @@ const authUser = require('../middleware/authUser');
 
 
 // create a user :post "/auth",!auth
+let success = false
 router.post('/register', [
 
     body('name', 'Enter a valid name').isLength({ min: 3 }),
@@ -43,9 +44,9 @@ router.post('/register', [
                 id: user.id
             }
         }
-
+        success=true
         const authToken = jwt.sign(data, JWT_TOKEN)
-        res.send({ authToken })
+        res.send({ success,authToken })
     }
     catch (error) {
         console.log(error);
@@ -61,7 +62,6 @@ router.post('/login', [
     body('password', 'Password cannot be blank').exists(),
 
 ], async (req, res) => {
-    let success = false
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
