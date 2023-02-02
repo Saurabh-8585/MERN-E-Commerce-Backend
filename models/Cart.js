@@ -16,6 +16,7 @@ const CartSchema = new Schema({
     price: Number,
     rating:Number,
     category: String,
+    type:String,
 })
 
 module.exports = mongoose.model("cart", CartSchema)

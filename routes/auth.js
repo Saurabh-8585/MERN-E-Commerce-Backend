@@ -20,7 +20,7 @@ router.post('/register', [
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ error: errors.array() })
     }
 
     try {
@@ -44,9 +44,9 @@ router.post('/register', [
                 id: user.id
             }
         }
-        success=true
+        success = true
         const authToken = jwt.sign(data, JWT_TOKEN)
-        res.send({ success,authToken })
+        res.send({ success, authToken })
     }
     catch (error) {
         console.log(error);
@@ -64,7 +64,7 @@ router.post('/login', [
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ error: errors.array() })
     }
 
     const { email, password } = req.body;

@@ -21,19 +21,13 @@ router.get('/fetchcart', authUser, async (req, res) => {
 router.post('/addcart', authUser, async (req, res) => {
 
     try {
-        const { name, description, brand, price, category, image, rating, _id } = req.body
+        const { name, description, brand, price, category, image, rating, _id, type } = req.body
         const user = req.header
-        // const product = await Cart.findOne({ productId: _id })
-        // if (product) {
-        //     res.status(404).send({ status: 'exists', carts })
-        // }
-        // else {
-            const cart = new Cart({
-                name, description, brand, price, image, category, rating, user: req.user.id, productId: _id
-            })
-            const savedCart = await cart.save()
-            res.send(savedCart)
-        // }
+        const cart = new Cart({
+            name, description, brand, price, image, category, rating, type, user: req.user.id, productId: _id
+        })
+        const savedCart = await cart.save()
+        res.send(savedCart)
     }
 
 
