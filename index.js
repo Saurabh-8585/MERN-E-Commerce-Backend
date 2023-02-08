@@ -5,6 +5,7 @@ const app = express()
 const cors = require('cors')
 const auth = require('./routes/auth');
 const cart = require('./routes/cart')
+const wishlist = require('./routes/wishlist')
 const product = require('./routes/product')
 connectToMongo();
 const port = 5000
@@ -21,8 +22,9 @@ app.use(express.json())
 
 // Available Routes
 app.use('/api/auth', auth)
-app.use('/api/cart', cart)
 app.use('/api/product', product)
+app.use('/api/cart', cart)
+app.use('/api/wishlist', wishlist)
 
 
 app.listen(port, () => {
