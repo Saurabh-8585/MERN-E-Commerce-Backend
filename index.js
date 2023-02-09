@@ -7,6 +7,7 @@ const auth = require('./routes/auth');
 const cart = require('./routes/cart')
 const wishlist = require('./routes/wishlist')
 const product = require('./routes/product')
+const review = require('./routes/review')
 connectToMongo();
 const port = 5000
 
@@ -25,6 +26,7 @@ app.use('/api/auth', auth)
 app.use('/api/product', product)
 app.use('/api/cart', cart)
 app.use('/api/wishlist', wishlist)
+// app.use('/api/review', review)
 
 
 app.listen(port, () => {

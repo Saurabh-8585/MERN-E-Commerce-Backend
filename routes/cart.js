@@ -7,7 +7,7 @@ const authUser = require('../middleware/authUser')
 // get all cart products
 router.get('/fetchcart', authUser, async (req, res) => {
     try {
-        const cart = await Cart.find({ user: req.user.id })
+        const cart = await Cart.find({ user: req.user.id }).populate('productId')
         res.send(cart)
     }
     catch (error) {
@@ -21,10 +21,10 @@ router.get('/fetchcart', authUser, async (req, res) => {
 router.post('/addcart', authUser, async (req, res) => {
 
     try {
-        const { name, description, brand, price, category, image, rating, _id, type } = req.body
+        const { _id } = req.body
         const user = req.header
         const cart = new Cart({
-            name, description, brand, price, image, category, rating, type, user: req.user.id, productId: _id
+            user: req.user.id, productId: _id
         })
         const savedCart = await cart.save()
         res.send(savedCart)

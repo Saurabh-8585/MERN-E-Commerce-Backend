@@ -7,11 +7,10 @@ const authUser = require('../middleware/authUser')
 
 router.get('/fetchwishlist', authUser, async (req, res) => {
     try {
-        const wishlistData = await Wishlist.find({ user: req.user.id })
+        const wishlistData = await Wishlist.find({ user: req.user.id }).populate("productId")
         res.send(wishlistData)
     }
     catch (error) {
-        console.log(error);
         res.status(500).send("Internal server error")
     }
 })
@@ -20,9 +19,15 @@ router.post('/addwishlist', authUser, async (req, res) => {
     try {
         const { _id } = req.body
         const user = req.header
-        const wishlistData = new Wishlist({ user: req.user.id, productId: _id })
-        const savedWishlist = await wishlistData.save()
-        res.send(savedWishlist)
+        const findProduct = await Wishlist.findOne({ productId: _id })
+        if (findProduct) {
+            return res.status(400).json({ msg: "Product already in a wishlist" })
+        }
+        else {
+            const wishlistData = new Wishlist({ user: req.user.id, productId: _id })
+            const savedWishlist = await wishlistData.save()
+            res.send(savedWishlist)
+        }
     }
     catch (error) {
         console.log(error);
