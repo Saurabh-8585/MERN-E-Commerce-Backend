@@ -26,7 +26,7 @@ app.use('/api/auth', auth)
 app.use('/api/product', product)
 app.use('/api/cart', cart)
 app.use('/api/wishlist', wishlist)
-// app.use('/api/review', review)
+app.use('/api/review', review)
 
 
 app.listen(port, () => {

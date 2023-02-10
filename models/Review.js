@@ -5,7 +5,7 @@ const ReviewSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     },
-    productDetails: {
+    productId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'product'
     },
@@ -19,6 +19,7 @@ const ReviewSchema = new Schema({
         type: Date,
         default: Date.now
     },
+
 
 })
 
