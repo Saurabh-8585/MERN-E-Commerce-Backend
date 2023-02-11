@@ -15,13 +15,9 @@ const ReviewSchema = new Schema({
     comment: {
         type: String
     },
-    date: {
-        type: Date,
-        default: Date.now
-    },
+   
 
-
-})
+}, { timestamps: true })
 
 
 module.exports = mongoose.model("review", ReviewSchema)

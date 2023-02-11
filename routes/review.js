@@ -5,7 +5,7 @@ const authUser = require('../middleware/authUser')
 
 router.get('/fetchreview/:id', async (req, res) => {
     try {
-        const reviewData = await Review.find({ productId: req.params.id }).populate("user", "name")
+        const reviewData = await Review.find({ productId: req.params.id }).populate("user", "name").sort({ createdAt: -1 })
         res.send(reviewData)
     }
     catch (error) {

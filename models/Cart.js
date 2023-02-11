@@ -9,10 +9,7 @@ const CartSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'product'
     },
-    date: {
-        type: Date,
-        default: Date.now
-    },
-})
+
+}, { timestamps: true })
 
 module.exports = mongoose.model("cart", CartSchema)
