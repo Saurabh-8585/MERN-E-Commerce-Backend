@@ -3,8 +3,7 @@ const razorpayDetails = require('../razorPayDetails');
 const crypto = require('crypto');
 const Payment = require('../models/Payment');
 
-
-
+let user = '';
 
 const instance = new Razorpay({
     key_id: razorpayDetails.key,
@@ -12,10 +11,10 @@ const instance = new Razorpay({
 });
 const checkout = async (req, res) => {
 
-
-
+    const { amount, userId } = req.body
+    user += userId
     const options = {
-        amount: Number(req.body.amount * 100),
+        amount: Number(amount * 100),
         currency: "INR",
     };
     const order = await instance.orders.create(options);
@@ -29,10 +28,7 @@ const checkout = async (req, res) => {
 // 
 const paymentVerification = async (req, res) => {
 
-
-
-
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, email } = req.body;
 
     const body = razorpay_order_id + "|" + razorpay_payment_id;
 
@@ -50,11 +46,10 @@ const paymentVerification = async (req, res) => {
             razorpay_order_id,
             razorpay_payment_id,
             razorpay_signature,
+            user
         });
 
-        // res.redirect(`http://localhost:3000/paymentsuccess?reference=${razorpay_payment_id}`);
-        res.send({ success: true })
-
+        res.redirect(`http://localhost:3000/paymentsuccess?reference=${razorpay_payment_id}`);
 
     } else {
         res.status(400).json({
