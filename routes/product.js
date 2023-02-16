@@ -5,6 +5,7 @@ router.get('/fetchproduct', async (req, res) => {
     try {
         const product = await Product.find()
         res.send(product)
+        // console.log(product);
     }
     catch (error) {
         console.log(error);

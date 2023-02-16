@@ -2,26 +2,33 @@ const Razorpay = require('razorpay');
 const razorpayDetails = require('../razorPayDetails');
 const crypto = require('crypto');
 const Payment = require('../models/Payment');
+const Cart = require('../models/Cart');
+// const User = require('../models/User');
+// var ObjectId = require('mongodb').ObjectId;
 
-let user = '';
 
+
+let productInfo = {};
+let userInfo;
 const instance = new Razorpay({
     key_id: razorpayDetails.key,
     key_secret: razorpayDetails.secret,
 });
 const checkout = async (req, res) => {
-
-    const { amount, userId } = req.body
-    user += userId
+    const { amount, userId, productDetails } = req.body
+    userInfo = userId
+    let productArr = JSON.parse(productDetails)
+    productInfo = productArr
     const options = {
         amount: Number(amount * 100),
         currency: "INR",
     };
     const order = await instance.orders.create(options);
 
+
     res.status(200).json({
         success: true,
-        order,
+        order
     });
 
 };
@@ -46,8 +53,13 @@ const paymentVerification = async (req, res) => {
             razorpay_order_id,
             razorpay_payment_id,
             razorpay_signature,
-            user
+            user:userInfo,
+            productData: productInfo,
         });
+
+
+
+        const deleteCart = await Cart.deleteMany({ 'user': userInfo })
 
         res.redirect(`http://localhost:3000/paymentsuccess?reference=${razorpay_payment_id}`);
 

@@ -7,7 +7,7 @@ const authUser = require('../middleware/authUser')
 // get all cart products
 router.get('/fetchcart', authUser, async (req, res) => {
     try {
-        const cart = await Cart.find({ user: req.user.id }).populate("productId").populate('user')
+        const cart = await Cart.find({ user: req.user.id }).populate("productId","name price image rating type").populate('user', "name email")
         res.send(cart)
     }
     catch (error) {

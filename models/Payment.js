@@ -13,6 +13,10 @@ const PaymentSchema = new Schema({
         type: String,
         required: true,
     },
+    productData: {
+        type: Object,
+        required: true,
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
