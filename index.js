@@ -15,10 +15,10 @@ const port = 5000
 const app = express()
 
 // create application/json parser
-// app.use(bodyParser.json())
+app.use(bodyParser.json())
 // create application/x-www-form-urlencoded parser
-// app.use(bodyParser.urlencoded({ extended: false }))
-// app.use(express.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: true }))
 
 
 
