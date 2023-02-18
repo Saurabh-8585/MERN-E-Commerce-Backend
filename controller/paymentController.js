@@ -3,22 +3,23 @@ const razorpayDetails = require('../razorPayDetails');
 const crypto = require('crypto');
 const Payment = require('../models/Payment');
 const Cart = require('../models/Cart');
-// const User = require('../models/User');
-// var ObjectId = require('mongodb').ObjectId;
 
 
 
 let productInfo = {};
+let userData = {};
 let userInfo;
+let totalAmount;
 const instance = new Razorpay({
     key_id: razorpayDetails.key,
     key_secret: razorpayDetails.secret,
 });
 const checkout = async (req, res) => {
-    const { amount, userId, productDetails } = req.body
+    const { amount, userId, productDetails, userDetails } = req.body
+    totalAmount = Number(amount)
     userInfo = userId
-    let productArr = JSON.parse(productDetails)
-    productInfo = productArr
+    productInfo = JSON.parse(productDetails)
+    userData = JSON.parse(userDetails)
     const options = {
         amount: Number(amount * 100),
         currency: "INR",
@@ -35,7 +36,7 @@ const checkout = async (req, res) => {
 // 
 const paymentVerification = async (req, res) => {
 
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, email } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
     const body = razorpay_order_id + "|" + razorpay_payment_id;
 
@@ -53,8 +54,10 @@ const paymentVerification = async (req, res) => {
             razorpay_order_id,
             razorpay_payment_id,
             razorpay_signature,
-            user:userInfo,
+            user: userInfo,
             productData: productInfo,
+            userData,
+            totalAmount
         });
 
 

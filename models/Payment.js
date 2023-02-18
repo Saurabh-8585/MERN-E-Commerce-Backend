@@ -17,10 +17,18 @@ const PaymentSchema = new Schema({
         type: Object,
         required: true,
     },
+    userData: {
+        type: Object,
+        required: true,
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     },
+    totalAmount: {
+        type: Number,
+    },
+
 
 }, { timestamps: true })
 
