@@ -1,11 +1,12 @@
 const express = require('express');
 const jwt = require("jsonwebtoken");
-const JWT_TOKEN = require('../JWTKEY');
 const User = require('../models/User');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const { body, validationResult } = require('express-validator');
 const authUser = require('../middleware/authUser');
+const dotenv = require('dotenv');
+dotenv.config()
 
 
 // create a user :post "/auth",!auth
@@ -51,7 +52,7 @@ router.post('/register', [
             }
         }
         success = true
-        const authToken = jwt.sign(data, JWT_TOKEN)
+        const authToken = jwt.sign(data, process.env.JWT_SECRET)
         res.send({ success, authToken })
     }
     catch (error) {
@@ -91,7 +92,7 @@ router.post('/login', [
             }
         }
 
-        const authToken = jwt.sign(data, JWT_TOKEN)
+        const authToken = jwt.sign(data, process.env.JWT_SECRET)
         success = true
         res.send({ success, authToken })
     }
@@ -115,4 +116,24 @@ router.get('/getuser', authUser, async (req, res) => {
     }
 }
 )
+
+
+// update user details
+router.put('/updateuser', authUser, async (req, res) => {
+    const { userDetails } = req.body
+    let convertData = JSON.parse(userDetails)
+    try {
+        const user = await User.findById(req.user.id)
+        if (user) {
+            let updateDetails = await User.findByIdAndUpdate(req.user.id, { $set: convertData })
+            success = true
+            res.status(200).send({ success  })
+        }
+        else {
+            return res.status(400).send({ success, error: "User Not Authorized" })
+        }
+    } catch (error) {
+        res.send("Access Denied")
+    }
+})
 module.exports = router

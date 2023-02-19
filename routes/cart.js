@@ -1,13 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const Cart = require('../models/Cart')
-const Product = require('../models/Product')
 const authUser = require('../middleware/authUser')
 
 // get all cart products
 router.get('/fetchcart', authUser, async (req, res) => {
     try {
-        const cart = await Cart.find({ user: req.user.id }).populate("productId","name price image rating type").populate('user', "name email")
+        const cart = await Cart.find({ user: req.user.id }).populate("productId", "name price image rating type").populate('user', "name email")
         res.send(cart)
     }
     catch (error) {
@@ -21,10 +20,10 @@ router.get('/fetchcart', authUser, async (req, res) => {
 router.post('/addcart', authUser, async (req, res) => {
 
     try {
-        const { _id } = req.body
+        const { _id, quantity } = req.body
         const user = req.header
         const cart = new Cart({
-            user: req.user.id, productId: _id
+            user: req.user.id, productId: _id, quantity
         })
         const savedCart = await cart.save()
         res.send(savedCart)

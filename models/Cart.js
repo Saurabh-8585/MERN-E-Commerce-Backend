@@ -9,6 +9,9 @@ const CartSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'product'
     },
+    quantity: {
+        type: Number
+    }
 
 }, { timestamps: true })
 

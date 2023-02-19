@@ -1,14 +1,14 @@
 const express = require('express');
 const { checkout, paymentVerification } = require('../controller/paymentController');
-const razorPayDetails = require('../razorPayDetails');
 const router = express.Router()
 const Payment = require('../models/Payment')
 const authUser = require('../middleware/authUser')
-
+const dotenv = require('dotenv');
+dotenv.config()
 
 router.route('/checkout').post(checkout)
 router.route('/paymentverification').post(paymentVerification)
-router.route('/getkey').get((req, res) => res.status(200).json({ key: razorPayDetails.key }))
+router.route('/getkey').get((req, res) => res.status(200).json({ key: process.env.RAZORPAY_API_KEY }))
 
 
 router.get('/getPreviousOrders',authUser, async (req, res) => {
