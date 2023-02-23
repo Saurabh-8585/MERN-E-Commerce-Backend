@@ -3,15 +3,40 @@ const router = express.Router();
 const Review = require('../models/Review')
 const authUser = require('../middleware/authUser')
 
-router.get('/fetchreview/:id', async (req, res) => {
+router.post('/fetchreview/:id', async (req, res) => {
+    const { filterType } = req.body
     try {
-        const reviewData = await Review.find({ productId: req.params.id }).populate("user", "firstName lastName").sort({ createdAt: -1 })
-        res.send(reviewData)
+        if (filterType === 'all') {
+            const reviewData = await Review.find({ productId: req.params.id }).populate("user", "firstName lastName")
+            res.send(reviewData)
+        }
+        else if (filterType === 'mostrecent') {
+            const reviewData = await Review.find({ productId: req.params.id }).populate("user", "firstName lastName").sort({ createdAt: -1 })
+            res.send(reviewData)
+        }
+        else if (filterType === 'old') {
+            const reviewData = await Review.find({ productId: req.params.id }).populate("user", "firstName lastName").sort({ createdAt: 1 })
+            res.send(reviewData)
+        }
+        else if (filterType === 'positivefirst') {
+            const reviewData = await Review.find({ productId: req.params.id, }).populate("user", "firstName lastName").sort({ rating: -1 })
+            res.send(reviewData)
+        }
+        else if (filterType === 'negativefirst') {
+            const reviewData = await Review.find({ productId: req.params.id }).populate("user", "firstName lastName").sort({ rating: 1 })
+            res.send(reviewData)
+        }
+        // else {
+        //     const reviewData = await Review.find({ productId: req.params.id }).populate("user", "firstName lastName")
+        //     res.send(reviewData)
+        // }
+
     }
     catch (error) {
         res.status(500).send("Internal server error")
     }
 })
+
 router.post('/addreview', authUser, async (req, res) => {
     try {
         const { _id, comment, rating } = req.body
@@ -23,12 +48,24 @@ router.post('/addreview', authUser, async (req, res) => {
         else {
             const reviewData = new Review({ user: req.user.id, productId: _id, comment: comment, rating: rating })
             const savedReview = await reviewData.save()
-            res.send({ msg: "Review added successfully" })
+            res.send({ user: req.user.id, msg: "Review added successfully" })
         }
     }
     catch (error) {
         res.status(500).send("Internal server error")
     }
 })
-// router.delete('/deletereview/:id',au)
+router.delete('/deletereview/:id', authUser, async (req, res) => {
+    const id = req.params.id
+    const user = req.header
+    console.log(id);
+    try {
+        let deleteReview = await Review.deleteOne({ user: req.user.id })
+        console.log(deleteReview);
+        res.send({ msg: "Successful" })
+    } catch (error) {
+        res.send({ msg: error })
+    }
+
+})
 module.exports = router
