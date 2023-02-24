@@ -122,15 +122,16 @@ router.get('/getuser', authUser, async (req, res) => {
 router.put('/updateuser', authUser, async (req, res) => {
     const { userDetails } = req.body
     let convertData = JSON.parse(userDetails)
+    const user = req.header
     try {
         const user = await User.findById(req.user.id)
         if (user) {
             let updateDetails = await User.findByIdAndUpdate(req.user.id, { $set: convertData })
             success = true
-            res.status(200).send({ success  })
+            res.status(200).send({ success })
         }
         else {
-            return res.status(400).send({ success, error: "User Not Authorized" })
+            return res.status(400).send({ success, error: "User Not Found" })
         }
     } catch (error) {
         res.send("Access Denied")

@@ -39,14 +39,14 @@ router.post('/fetchreview/:id', async (req, res) => {
 
 router.post('/addreview', authUser, async (req, res) => {
     try {
-        const { _id, comment, rating } = req.body
+        const { id, comment, rating } = req.body
         const user = req.header
-        const findReview = await Review.findOne({ $and: [{ user: req.user.id }, { productId: _id }] })
+        const findReview = await Review.findOne({ $and: [{ user: req.user.id }, { productId: id }] })
         if (findReview) {
             return res.status(400).json({ msg: "Already reviewed that product " })
         }
         else {
-            const reviewData = new Review({ user: req.user.id, productId: _id, comment: comment, rating: rating })
+            const reviewData = new Review({ user: req.user.id, productId: id, comment: comment, rating: rating })
             const savedReview = await reviewData.save()
             res.send({ user: req.user.id, msg: "Review added successfully" })
         }
@@ -55,17 +55,38 @@ router.post('/addreview', authUser, async (req, res) => {
         res.status(500).send("Internal server error")
     }
 })
+
+
+
 router.delete('/deletereview/:id', authUser, async (req, res) => {
     const id = req.params.id
     const user = req.header
-    console.log(id);
     try {
         let deleteReview = await Review.deleteOne({ user: req.user.id })
-        console.log(deleteReview);
         res.send({ msg: "Successful" })
     } catch (error) {
         res.send({ msg: error })
     }
 
+})
+
+
+
+router.put('/editreview', authUser, async (req, res) => {
+    const { id, comment, rating } = req.body
+
+    const review = await Review.findById(id)
+    try {
+        if (review) {
+            let updateDetails = await Review.findByIdAndUpdate(id, { $set: { rating: rating, comment:comment } })
+            success = true
+            res.status(200).send({ success, msg: "Review edited successfully" })
+        }
+        else {
+            return res.status(400).send({ success, error: "User Not Found" })
+        }
+    } catch (error) {
+        res.send("Access Denied")
+    }
 })
 module.exports = router
