@@ -87,6 +87,7 @@ router.put('/editreview', authUser, async (req, res) => {
         }
     } catch (error) {
         res.send("Access Denied")
+        console.log(error);
     }
 })
 module.exports = router
