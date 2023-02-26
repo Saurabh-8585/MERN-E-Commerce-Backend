@@ -2,6 +2,8 @@ const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const Payment = require('../models/Payment');
 const Cart = require('../models/Cart');
+const { sendOrderEmail } = require('./forgotPasswordController')
+
 const dotenv = require('dotenv');
 dotenv.config()
 
@@ -59,17 +61,13 @@ const paymentVerification = async (req, res) => {
             userData,
             totalAmount
         });
-
-
-
         const deleteCart = await Cart.deleteMany({ 'user': userInfo })
-
-        res.redirect(`http://localhost:3000/paymentsuccess?reference=${razorpay_payment_id}`);
-
+        res.redirect(`${process.env.PAYMENT_SUCCESS}=${razorpay_payment_id}`);
     } else {
         res.status(400).json({
             success: false,
         });
     }
 }
+
 module.exports = { checkout, paymentVerification }

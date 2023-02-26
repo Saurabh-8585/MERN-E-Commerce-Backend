@@ -8,6 +8,7 @@ const wishlist = require('./routes/wishlist')
 const product = require('./routes/product')
 const review = require('./routes/review')
 const paymentRoute = require('./routes/paymentRoute')
+const forgotPassword = require('./routes/forgotPassword')
 connectToMongo();
 
 const port = 5000
@@ -39,6 +40,9 @@ app.use('/api/review', review)
 
 // payment route
 app.use('/api', paymentRoute)
+
+// forgot Password route
+app.use('/api/reset-password', forgotPassword)
 
 
 app.listen(port, () => {
