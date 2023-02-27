@@ -109,7 +109,7 @@ router.get('/getuser', authUser, async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select("-password")
         success = true
-        res.send({user:user,success})
+        res.send(user)
 
     } catch (error) {
         console.log(error);
