@@ -3,7 +3,6 @@ const crypto = require('crypto');
 const Payment = require('../models/Payment');
 const Cart = require('../models/Cart');
 const nodemailer = require('nodemailer');
-
 const dotenv = require('dotenv');
 dotenv.config()
 
@@ -12,75 +11,63 @@ let productInfo = {};
 let userData = {};
 let userInfo;
 let totalAmount;
-let userEmail;
 const instance = new Razorpay({
-    key_id: process.env.RAZORPAY_API_KEY,
-    key_secret: process.env.RAZORPAY_API_SECRET,
+  key_id: process.env.RAZORPAY_API_KEY,
+  key_secret: process.env.RAZORPAY_API_SECRET,
 });
 const checkout = async (req, res) => {
-    const { amount, userId, productDetails, userDetails, email } = req.body
-    totalAmount = Number(amount)
-    userInfo = userId
-    productInfo = JSON.parse(productDetails)
-    userData = JSON.parse(userDetails)
-    userEmail = email
-
-    const options = {
-        amount: Number(amount * 100),
-        currency: "INR",
-    };
-    const order = await instance.orders.create(options);
+  const { amount, userId, productDetails, userDetails } = req.body
+  totalAmount = Number(amount)
+  userInfo = userId
+  productInfo = JSON.parse(productDetails)
+  userData = JSON.parse(userDetails)
 
 
-    res.status(200).json({
-        success: true,
-        order
-    });
+  const options = {
+    amount: Number(amount * 100),
+    currency: "INR",
+  };
+  const order = await instance.orders.create(options);
+
+
+  res.status(200).json({
+    success: true,
+    order
+  });
 
 };
 // 
+console.log(userData.userEmail, 1);
+console.log(process.env.EMAIL, process.env.EMAIL_PASSWORD);
 const paymentVerification = async (req, res) => {
 
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
+  const body = razorpay_order_id + "|" + razorpay_payment_id;
 
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+  const expectedSignature = crypto
+    .createHmac("sha256", process.env.RAZORPAY_API_SECRET)
+    .update(body.toString())
+    .digest("hex");
 
-    const body = razorpay_order_id + "|" + razorpay_payment_id;
-
-    const expectedSignature = crypto
-        .createHmac("sha256", process.env.RAZORPAY_API_SECRET)
-        .update(body.toString())
-        .digest("hex");
-
-    const isAuthentic = expectedSignature === razorpay_signature;
-    try {
-        if (isAuthentic) {
-            // Database comes here
-
-            await Payment.create({
-                razorpay_order_id,
-                razorpay_payment_id,
-                razorpay_signature,
-                user: userInfo,
-                productData: productInfo,
-                userData,
-                totalAmount
-            });
-            const deleteCart = await Cart.deleteMany({ 'user': userInfo })
-            const transport = nodemailer.createTransport({
-                service: "gmail",
-                host: "smtp.gmail.email",
-                port: 465,
-                auth: {
-                    user: process.env.EMAIL,
-                    pass: process.env.EMAIL_PASSWORD
-                },
-            })
-            const mailOptions = {
-                from: process.env.EMAIL,
-                to: userEmail,
-                subject: "Order Confirm",
-                html: `<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  const isAuthentic = expectedSignature === razorpay_signature;
+  try {
+    if (isAuthentic) {
+      // Database comes here
+      const transport = nodemailer.createTransport({
+        service: "gmail",
+        host: "smtp.gmail.email",
+        port: 465,
+        auth: {
+          user: process.env.EMAIL,
+          pass: process.env.EMAIL_PASSWORD
+        },
+      })
+      const mailOptions = {
+        from: process.env.EMAIL,
+        to: userData.userEmail,
+        subject: "Order Confirm",
+        html: `<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
 <!--[if gte mso 9]>
@@ -105,17 +92,13 @@ const paymentVerification = async (req, res) => {
   .u-row .u-col {
     vertical-align: top;
   }
-
   .u-row .u-col-50 {
     width: 300px !important;
   }
-
   .u-row .u-col-100 {
     width: 600px !important;
   }
-
 }
-
 @media (max-width: 620px) {
   .u-row-container {
     max-width: 100% !important;
@@ -141,39 +124,31 @@ body {
   margin: 0;
   padding: 0;
 }
-
 table,
 tr,
 td {
   vertical-align: top;
   border-collapse: collapse;
 }
-
 p {
   margin: 0;
 }
-
 .ie-container table,
 .mso-container table {
   table-layout: fixed;
 }
-
 * {
   line-height: inherit;
 }
-
 a[x-apple-data-detectors='true'] {
   color: inherit !important;
   text-decoration: none !important;
 }
-
 table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .v-container-padding-padding { padding: 35px 10px 6px !important; } #u_content_heading_6 .v-container-padding-padding { padding: 35px 10px 6px !important; } #u_content_heading_8 .v-container-padding-padding { padding: 35px 10px 6px !important; } }
     </style>
   
   
-
 </head>
-
 <body class="clean-body u_body" style="margin: 0;padding: 0;-webkit-text-size-adjust: 100%;background-color: #dde5e7;color: #000000">
   <!--[if IE]><div class="ie-container"><![endif]-->
   <!--[if mso]><div class="mso-container"><![endif]-->
@@ -183,7 +158,6 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
     <td style="word-break: break-word;border-collapse: collapse !important;vertical-align: top">
     <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="background-color: #dde5e7;"><![endif]-->
     
-
 <div class="u-row-container" style="padding: 0px;background-color: transparent">
   <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
     <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
@@ -208,12 +182,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
       </tr>
     </tbody>
   </table>
-
       </td>
     </tr>
   </tbody>
 </table>
-
   <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
   </div>
 </div>
@@ -222,9 +194,6 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
     </div>
   </div>
 </div>
-
-
-
 <div class="u-row-container" style="padding: 0px;background-color: transparent">
   <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #ffffff;">
     <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
@@ -241,12 +210,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
       <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:40px 10px 6px;font-family:arial,helvetica,sans-serif;" align="left">
         
   <h1 style="margin: 0px; color: #000000; line-height: 140%; text-align: center; word-wrap: break-word; font-family: tahoma,arial,helvetica,sans-serif; font-size: 32px; font-weight: 700; ">S h o p I t . c o m</h1>
-
       </td>
     </tr>
   </tbody>
 </table>
-
   <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
   </div>
 </div>
@@ -255,9 +222,6 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
     </div>
   </div>
 </div>
-
-
-
 <div class="u-row-container" style="padding: 0px;background-color: transparent">
   <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #ffffff;">
     <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
@@ -274,24 +238,20 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
       <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:19px 10px 4px;font-family:arial,helvetica,sans-serif;" align="left">
         
   <h1 style="margin: 0px; color: #000000; line-height: 140%; text-align: center; word-wrap: break-word; font-family: tahoma,arial,helvetica,sans-serif; font-size: 24px; ">${userData.firstName} ${userData.lastName}</h1>
-
       </td>
     </tr>
   </tbody>
 </table>
-
 <table id="u_content_heading_8" style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
   <tbody>
     <tr>
       <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:21px 10px 6px;font-family:arial,helvetica,sans-serif;" align="left">
         
   <h1 style="margin: 0px; color: #000000; line-height: 140%; text-align: center; word-wrap: break-word; font-family: tahoma,arial,helvetica,sans-serif; font-size: 32px; ">Your Order ID is</h1>
-
       </td>
     </tr>
   </tbody>
 </table>
-
 <table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
   <tbody>
     <tr>
@@ -300,12 +260,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
   <div style="line-height: 140%; text-align: center; word-wrap: break-word;">
     <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 18px; line-height: 25.2px;"><strong>${razorpay_order_id}</strong></span></p>
   </div>
-
       </td>
     </tr>
   </tbody>
 </table>
-
   <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
   </div>
 </div>
@@ -314,9 +272,6 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
     </div>
   </div>
 </div>
-
-
-
 <div class="u-row-container" style="padding: 0px;background-color: transparent">
   <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #ffffff;">
     <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
@@ -335,12 +290,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
   <div style="color: #333333; line-height: 140%; text-align: center; word-wrap: break-word;">
     <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 20px; line-height: 28px; background-color: #ecf0f1; font-family: tahoma, arial, helvetica, sans-serif;">&nbsp; Payment ID&nbsp; </span></p>
   </div>
-
       </td>
     </tr>
   </tbody>
 </table>
-
 <table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
   <tbody>
     <tr>
@@ -355,12 +308,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
       </tr>
     </tbody>
   </table>
-
       </td>
     </tr>
   </tbody>
 </table>
-
 <table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
   <tbody>
     <tr>
@@ -369,12 +320,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
   <div style="color: #333333; line-height: 140%; text-align: center; word-wrap: break-word;">
     <p style="font-size: 14px; line-height: 140%;"><span style="font-family: terminal, monaco; font-size: 14px; line-height: 19.6px;"><strong><span style="font-size: 22px; line-height: 30.8px;">${razorpay_payment_id}</span></strong></span></p>
   </div>
-
       </td>
     </tr>
   </tbody>
 </table>
-
   <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
   </div>
 </div>
@@ -390,14 +339,12 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
       <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:50px 10px 1px;font-family:arial,helvetica,sans-serif;" align="left">
         
   <div style="color: #333333; line-height: 140%; text-align: center; word-wrap: break-word;">
-    <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 20px; line-height: 28px; background-color: #ecf0f1; font-family: tahoma, arial, helvetica, sans-serif;">  Shipping Details  </span></p>
+    <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 20px; line-height: 28px; background-color: #ecf0f1; font-family: tahoma, arial, helvetica, sans-serif;">  Shipping Details  </span></p>
   </div>
-
       </td>
     </tr>
   </tbody>
 </table>
-
 <table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
   <tbody>
     <tr>
@@ -412,12 +359,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
       </tr>
     </tbody>
   </table>
-
       </td>
     </tr>
   </tbody>
 </table>
-
 <table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
   <tbody>
     <tr>
@@ -426,12 +371,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
   <div style="color: #333333; line-height: 140%; text-align: center; word-wrap: break-word;">
     <p style="font-size: 14px; line-height: 140%;"><span style="font-family: arial, helvetica, sans-serif; font-size: 14px; line-height: 19.6px;"><span style="font-size: 18px; line-height: 25.2px;">${userData.address}, ${userData.city}-${userData.zipCode}, ${userData.userState}</span></span></p>
   </div>
-
       </td>
     </tr>
   </tbody>
 </table>
-
   <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
   </div>
 </div>
@@ -440,9 +383,6 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
     </div>
   </div>
 </div>
-
-
-
 <div class="u-row-container" style="padding: 0px;background-color: transparent">
   <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #34495e;">
     <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
@@ -461,12 +401,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
   <div style="color: #f8c567; line-height: 150%; text-align: center; word-wrap: break-word;">
     <p style="font-size: 14px; line-height: 150%;"><span style="font-family: arial, helvetica, sans-serif; font-size: 20px; line-height: 30px;"><span style="line-height: 30px; font-size: 20px;">w w w . S h o p I t . c o m</span></span></p>
   </div>
-
       </td>
     </tr>
   </tbody>
 </table>
-
 <table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
   <tbody>
     <tr>
@@ -476,12 +414,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
     <p style="font-size: 14px; line-height: 200%;"><span style="font-family: arial, helvetica, sans-serif; font-size: 16px; line-height: 32px;">If you have questions regarding your Data, please visit our Privacy Policy</span></p>
 <p style="font-size: 14px; line-height: 200%;"><span style="font-family: arial, helvetica, sans-serif; font-size: 16px; line-height: 32px;">Want to change how you receive these emails? You can update your preferences or unsubscribe from this list.</span></p>
   </div>
-
       </td>
     </tr>
   </tbody>
 </table>
-
   <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
   </div>
 </div>
@@ -490,9 +426,6 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
     </div>
   </div>
 </div>
-
-
-
 <div class="u-row-container" style="padding: 0px;background-color: transparent">
   <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
     <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
@@ -511,12 +444,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
   <div style="color: #7e8c8d; line-height: 140%; text-align: center; word-wrap: break-word;">
     <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 14px; line-height: 19.6px; font-family: arial, helvetica, sans-serif;">©ShopIt.com | Pune | Maharashtra | India</span></p>
   </div>
-
       </td>
     </tr>
   </tbody>
 </table>
-
   <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
   </div>
 </div>
@@ -525,8 +456,6 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
     </div>
   </div>
 </div>
-
-
     <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
     </td>
   </tr>
@@ -535,10 +464,9 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
   <!--[if mso]></div><![endif]-->
   <!--[if IE]></div><![endif]-->
 </body>
-
 </html>
 `,
-                text: `<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+        text: `<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
 <!--[if gte mso 9]>
@@ -563,17 +491,13 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
   .u-row .u-col {
     vertical-align: top;
   }
-
   .u-row .u-col-50 {
     width: 300px !important;
   }
-
   .u-row .u-col-100 {
     width: 600px !important;
   }
-
 }
-
 @media (max-width: 620px) {
   .u-row-container {
     max-width: 100% !important;
@@ -599,39 +523,31 @@ body {
   margin: 0;
   padding: 0;
 }
-
 table,
 tr,
 td {
   vertical-align: top;
   border-collapse: collapse;
 }
-
 p {
   margin: 0;
 }
-
 .ie-container table,
 .mso-container table {
   table-layout: fixed;
 }
-
 * {
   line-height: inherit;
 }
-
 a[x-apple-data-detectors='true'] {
   color: inherit !important;
   text-decoration: none !important;
 }
-
 table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .v-container-padding-padding { padding: 35px 10px 6px !important; } #u_content_heading_6 .v-container-padding-padding { padding: 35px 10px 6px !important; } #u_content_heading_8 .v-container-padding-padding { padding: 35px 10px 6px !important; } }
     </style>
   
   
-
 </head>
-
 <body class="clean-body u_body" style="margin: 0;padding: 0;-webkit-text-size-adjust: 100%;background-color: #dde5e7;color: #000000">
   <!--[if IE]><div class="ie-container"><![endif]-->
   <!--[if mso]><div class="mso-container"><![endif]-->
@@ -641,7 +557,6 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
     <td style="word-break: break-word;border-collapse: collapse !important;vertical-align: top">
     <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="background-color: #dde5e7;"><![endif]-->
     
-
 <div class="u-row-container" style="padding: 0px;background-color: transparent">
   <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
     <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
@@ -666,12 +581,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
       </tr>
     </tbody>
   </table>
-
       </td>
     </tr>
   </tbody>
 </table>
-
   <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
   </div>
 </div>
@@ -680,9 +593,6 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
     </div>
   </div>
 </div>
-
-
-
 <div class="u-row-container" style="padding: 0px;background-color: transparent">
   <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #ffffff;">
     <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
@@ -699,12 +609,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
       <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:40px 10px 6px;font-family:arial,helvetica,sans-serif;" align="left">
         
   <h1 style="margin: 0px; color: #000000; line-height: 140%; text-align: center; word-wrap: break-word; font-family: tahoma,arial,helvetica,sans-serif; font-size: 32px; font-weight: 700; ">S h o p I t . c o m</h1>
-
       </td>
     </tr>
   </tbody>
 </table>
-
   <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
   </div>
 </div>
@@ -713,9 +621,6 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
     </div>
   </div>
 </div>
-
-
-
 <div class="u-row-container" style="padding: 0px;background-color: transparent">
   <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #ffffff;">
     <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
@@ -732,24 +637,20 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
       <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:19px 10px 4px;font-family:arial,helvetica,sans-serif;" align="left">
         
   <h1 style="margin: 0px; color: #000000; line-height: 140%; text-align: center; word-wrap: break-word; font-family: tahoma,arial,helvetica,sans-serif; font-size: 24px; ">${userData.firstName} ${userData.lastName}</h1>
-
       </td>
     </tr>
   </tbody>
 </table>
-
 <table id="u_content_heading_8" style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
   <tbody>
     <tr>
       <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:21px 10px 6px;font-family:arial,helvetica,sans-serif;" align="left">
         
   <h1 style="margin: 0px; color: #000000; line-height: 140%; text-align: center; word-wrap: break-word; font-family: tahoma,arial,helvetica,sans-serif; font-size: 32px; ">Your Order ID is</h1>
-
       </td>
     </tr>
   </tbody>
 </table>
-
 <table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
   <tbody>
     <tr>
@@ -758,12 +659,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
   <div style="line-height: 140%; text-align: center; word-wrap: break-word;">
     <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 18px; line-height: 25.2px;"><strong>${razorpay_order_id}</strong></span></p>
   </div>
-
       </td>
     </tr>
   </tbody>
 </table>
-
   <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
   </div>
 </div>
@@ -772,9 +671,6 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
     </div>
   </div>
 </div>
-
-
-
 <div class="u-row-container" style="padding: 0px;background-color: transparent">
   <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #ffffff;">
     <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
@@ -793,12 +689,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
   <div style="color: #333333; line-height: 140%; text-align: center; word-wrap: break-word;">
     <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 20px; line-height: 28px; background-color: #ecf0f1; font-family: tahoma, arial, helvetica, sans-serif;">&nbsp; Payment ID&nbsp; </span></p>
   </div>
-
       </td>
     </tr>
   </tbody>
 </table>
-
 <table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
   <tbody>
     <tr>
@@ -813,12 +707,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
       </tr>
     </tbody>
   </table>
-
       </td>
     </tr>
   </tbody>
 </table>
-
 <table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
   <tbody>
     <tr>
@@ -827,12 +719,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
   <div style="color: #333333; line-height: 140%; text-align: center; word-wrap: break-word;">
     <p style="font-size: 14px; line-height: 140%;"><span style="font-family: terminal, monaco; font-size: 14px; line-height: 19.6px;"><strong><span style="font-size: 22px; line-height: 30.8px;">${razorpay_payment_id}</span></strong></span></p>
   </div>
-
       </td>
     </tr>
   </tbody>
 </table>
-
   <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
   </div>
 </div>
@@ -848,14 +738,12 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
       <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:50px 10px 1px;font-family:arial,helvetica,sans-serif;" align="left">
         
   <div style="color: #333333; line-height: 140%; text-align: center; word-wrap: break-word;">
-    <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 20px; line-height: 28px; background-color: #ecf0f1; font-family: tahoma, arial, helvetica, sans-serif;">  Shipping Details  </span></p>
+    <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 20px; line-height: 28px; background-color: #ecf0f1; font-family: tahoma, arial, helvetica, sans-serif;">  Shipping Details  </span></p>
   </div>
-
       </td>
     </tr>
   </tbody>
 </table>
-
 <table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
   <tbody>
     <tr>
@@ -870,12 +758,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
       </tr>
     </tbody>
   </table>
-
       </td>
     </tr>
   </tbody>
 </table>
-
 <table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
   <tbody>
     <tr>
@@ -884,12 +770,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
   <div style="color: #333333; line-height: 140%; text-align: center; word-wrap: break-word;">
     <p style="font-size: 14px; line-height: 140%;"><span style="font-family: arial, helvetica, sans-serif; font-size: 14px; line-height: 19.6px;"><span style="font-size: 18px; line-height: 25.2px;">${userData.address}, ${userData.city}-${userData.zipCode}, ${userData.userState}</span></span></p>
   </div>
-
       </td>
     </tr>
   </tbody>
 </table>
-
   <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
   </div>
 </div>
@@ -898,9 +782,6 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
     </div>
   </div>
 </div>
-
-
-
 <div class="u-row-container" style="padding: 0px;background-color: transparent">
   <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #34495e;">
     <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
@@ -919,12 +800,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
   <div style="color: #f8c567; line-height: 150%; text-align: center; word-wrap: break-word;">
     <p style="font-size: 14px; line-height: 150%;"><span style="font-family: arial, helvetica, sans-serif; font-size: 20px; line-height: 30px;"><span style="line-height: 30px; font-size: 20px;">w w w . S h o p I t . c o m</span></span></p>
   </div>
-
       </td>
     </tr>
   </tbody>
 </table>
-
 <table style="font-family:arial,helvetica,sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
   <tbody>
     <tr>
@@ -934,12 +813,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
     <p style="font-size: 14px; line-height: 200%;"><span style="font-family: arial, helvetica, sans-serif; font-size: 16px; line-height: 32px;">If you have questions regarding your Data, please visit our Privacy Policy</span></p>
 <p style="font-size: 14px; line-height: 200%;"><span style="font-family: arial, helvetica, sans-serif; font-size: 16px; line-height: 32px;">Want to change how you receive these emails? You can update your preferences or unsubscribe from this list.</span></p>
   </div>
-
       </td>
     </tr>
   </tbody>
 </table>
-
   <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
   </div>
 </div>
@@ -948,9 +825,6 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
     </div>
   </div>
 </div>
-
-
-
 <div class="u-row-container" style="padding: 0px;background-color: transparent">
   <div class="u-row" style="Margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
     <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
@@ -969,12 +843,10 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
   <div style="color: #7e8c8d; line-height: 140%; text-align: center; word-wrap: break-word;">
     <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 14px; line-height: 19.6px; font-family: arial, helvetica, sans-serif;">©ShopIt.com | Pune | Maharashtra | India</span></p>
   </div>
-
       </td>
     </tr>
   </tbody>
 </table>
-
   <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
   </div>
 </div>
@@ -983,8 +855,6 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
     </div>
   </div>
 </div>
-
-
     <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
     </td>
   </tr>
@@ -993,31 +863,40 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
   <!--[if mso]></div><![endif]-->
   <!--[if IE]></div><![endif]-->
 </body>
-
 </html>
 `,
 
-
-            }
-            transport.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    return res.send({ msg: error });
-                }
-                else {
-                    return res.send({ success, msg: "Email Sent Please Check Your Email" })
-                }
-            })
-            res.redirect(`${process.env.PAYMENT_SUCCESS}=${razorpay_payment_id}`);
+      }
+      transport.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          res.send({ msg: error });
         }
         else {
-            res.status(400).json({
-                success: false,
-            });
+          return res.send({ success, msg: "Password Changed Successfully" })
         }
+      })
+      await Payment.create({
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature,
+        user: userInfo,
+        productData: productInfo,
+        userData,
+        totalAmount
+      });
+      const deleteCart = await Cart.deleteMany({ 'user': userInfo })
+   
+      res.redirect(`${process.env.PAYMENT_SUCCESS}=${razorpay_payment_id}`);
     }
-    catch (error) {
-        console.log(error);
+    else {
+      res.status(400).json({
+        success: false,
+      });
     }
+  }
+  catch (error) {
+    console.log(error);
+  }
 }
 
 

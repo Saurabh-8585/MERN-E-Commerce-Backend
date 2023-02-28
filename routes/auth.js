@@ -135,7 +135,7 @@ router.put('/updateuser', authUser, async (req, res) => {
             return res.status(400).send({ success, error: "User Not Found" })
         }
     } catch (error) {
-        res.send("Access Denied")
+        res.send("Something went wrong")
     }
 })
 module.exports = router

@@ -15,7 +15,7 @@ router.route('/getkey').get((req, res) => res.status(200).json({ key: process.en
 
 router.get('/getPreviousOrders', authUser, async (req, res) => {
   try {
-    const data = await Payment.find({ user: req.user.id })
+    const data = await Payment.find({ user: req.user.id }).sort({ createdAt: -1 })
     res.send(data)
   }
   catch (error) {

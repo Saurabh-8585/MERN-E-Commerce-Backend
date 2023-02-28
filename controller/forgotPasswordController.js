@@ -4,11 +4,9 @@ const dotenv = require('dotenv');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 dotenv.config()
-let userMail;
 let success = false;
 const sendEmailLink = async (req, res) => {
   const { email } = req.body;
-  userMail = email;
   const findUser = await User.findOne({ email: email })
   try {
     if (findUser) {
