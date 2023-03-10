@@ -548,12 +548,12 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
         }
         else {
           success=true
-          return res.send({ success, msg: "Email Sent Please Check Your Email" })
+          return res.send({  msg: "Email Sent Please Check Your Email" })
         }
       })
     }
     else {
-      res.send({ msg: "User not found",success })
+      return res.status(400).json({ msg: "User not found" })
     }
 
   } catch (error) {
@@ -1105,24 +1105,23 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_image_1 .v-
               res.send({ msg: error });
             }
             else {
-              return res.send({ success, msg: "Password Changed Successfully" })
+              return res.send({  msg: "Password Changed Successfully" })
             }
           })
         }
         else {
-          return res.send({ msg: "some thing went wrong" });
+          return res.status(400).json({ msg: "some thing went wrong" });
         }
       }
       else {
-        res.send({ msg: "Link has been expired" });
+        return res.status(400).json({ msg: "Link has been expired" });
       }
 
     }
     else {
-      return res.send({ msg: "All fields are required" });;
+      return res.status(400).json({ msg: "All fields are required" });;
     }
   } catch (error) {
-    console.log(error);
     return res.send({ msg: error })
   }
 }
