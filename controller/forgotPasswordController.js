@@ -547,12 +547,13 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
           return res.send({ msg: error });
         }
         else {
+          success=true
           return res.send({ success, msg: "Email Sent Please Check Your Email" })
         }
       })
     }
     else {
-      res.send({ msg: "User not found" })
+      res.send({ msg: "User not found",success })
     }
 
   } catch (error) {
