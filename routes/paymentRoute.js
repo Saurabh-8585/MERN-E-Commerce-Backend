@@ -19,8 +19,7 @@ router.get('/getPreviousOrders', authUser, async (req, res) => {
     res.send(data)
   }
   catch (error) {
-    console.log(error);
-    res.status(500).send("Internal server error")
+    res.status(500).send("Something went wrong")
   }
 })
 

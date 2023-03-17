@@ -10,7 +10,7 @@ router.get('/fetchwishlist', authUser, async (req, res) => {
         res.send(wishlistData)
     }
     catch (error) {
-        res.status(500).send("Internal server error")
+        res.status(500).send("Something went wrong")
     }
 })
 router.post('/addwishlist', authUser, async (req, res) => {
@@ -18,7 +18,7 @@ router.post('/addwishlist', authUser, async (req, res) => {
     try {
         const { _id } = req.body
         const user = req.header
-        const findProduct = await Wishlist.findOne({ productId: _id })
+        const findProduct = await Wishlist.findOne({ $and: [{ productId: _id }, { user: req.user.id }] })
         if (findProduct) {
             return res.status(400).json({ msg: "Product already in a wishlist" })
         }
@@ -30,17 +30,16 @@ router.post('/addwishlist', authUser, async (req, res) => {
     }
     catch (error) {
         console.log(error);
-        res.status(500).send("Internal server error")
+        res.status(500).send("Something went wrong")
     }
 })
 router.delete('/deletewishlist/:id', authUser, async (req, res) => {
 
     try {
-        const result = await Wishlist.deleteOne({ productId: req.params.id })
+        const result = await Wishlist.deleteOne({ $and: [{ productId: req.params.id }, { user: req.user.id }] })
         res.send(result)
     } catch (error) {
-        console.log(error);
-        res.status(500).send("Internal server error")
+        res.status(500).send("Something went wrong")
     }
 
 

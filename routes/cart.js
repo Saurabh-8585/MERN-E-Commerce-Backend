@@ -11,7 +11,6 @@ router.get("/fetchcart", authUser, async (req, res) => {
             .populate("user", "name email");
         res.send(cart);
     } catch (error) {
-        console.log(error);
         res.status(500).send("Internal server error");
     }
 });
@@ -21,7 +20,7 @@ router.get("/fetchcart", authUser, async (req, res) => {
 router.post("/addcart", authUser, async (req, res) => {
     try {
         const { _id, quantity } = req.body;
-        const findProduct = await Cart.findOne({ productId: _id })
+        const findProduct = await Cart.findOne({$and: [{ productId: _id }, { user: req.user.id }] })
         if (findProduct) {
             return res.status(400).json({ msg: "Product already in a cart" })
         }
@@ -36,7 +35,6 @@ router.post("/addcart", authUser, async (req, res) => {
             res.send(savedCart);
         }
     } catch (error) {
-        console.log(error);
         res.status(500).send("Internal server error");
     }
 });
@@ -44,10 +42,9 @@ router.post("/addcart", authUser, async (req, res) => {
 // remove from cart
 router.delete("/deletecart/:id", authUser, async (req, res) => {
     try {
-        const result = await Cart.deleteOne({ productId: req.params.id });
+        const result = await Cart.deleteOne({ $and: [{ productId: req.params.id }, { user: req.user.id }] });
         res.send(result);
     } catch (error) {
-        console.log(error);
         res.status(500).send("Internal server error");
     }
 });

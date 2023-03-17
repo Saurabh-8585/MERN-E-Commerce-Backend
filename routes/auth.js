@@ -56,7 +56,6 @@ router.post('/register', [
         res.send({ success, authToken })
     }
     catch (error) {
-        console.log(error);
         res.status(500).send("Internal server error")
     }
 })
@@ -79,7 +78,7 @@ router.post('/login', [
         let user = await User.findOne({ email });
         if (!user) {
 
-            return res.status(400).send({ success, error: "Please try to login with correct credentials" })
+            return res.status(400).send({ success, error: "User not found" })
         }
         const passComp = await bcrypt.compare(password, user.password)
         if (!passComp) {
@@ -97,7 +96,6 @@ router.post('/login', [
         res.send({ success, authToken })
     }
     catch (error) {
-        console.log(error);
         res.status(500).send("Internal server error002")
     }
 }
@@ -112,8 +110,7 @@ router.get('/getuser', authUser, async (req, res) => {
         res.send(user)
 
     } catch (error) {
-        console.log(error);
-        res.status(500).send("Internal server error 0001")
+        res.status(400).send("Something went wrong")
     }
 }
 )
@@ -132,7 +129,7 @@ router.put('/updateuser', authUser, async (req, res) => {
             res.status(200).send({ success })
         }
         else {
-            return res.status(400).send({ success, error: "User Not Found" })
+            return res.status(400).send("User Not Found")
         }
     } catch (error) {
         res.send("Something went wrong")

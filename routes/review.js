@@ -26,10 +26,10 @@ router.post('/fetchreview/:id', async (req, res) => {
             const reviewData = await Review.find({ productId: req.params.id }).populate("user", "firstName lastName").sort({ rating: 1 })
             res.send(reviewData)
         }
-        // else {
-        //     const reviewData = await Review.find({ productId: req.params.id }).populate("user", "firstName lastName")
-        //     res.send(reviewData)
-        // }
+        else {
+            const reviewData = await Review.find({ productId: req.params.id }).populate("user", "firstName lastName")
+            res.send(reviewData)
+        }
 
     }
     catch (error) {
@@ -48,11 +48,11 @@ router.post('/addreview', authUser, async (req, res) => {
         else {
             const reviewData = new Review({ user: req.user.id, productId: id, comment: comment, rating: rating })
             const savedReview = await reviewData.save()
-            res.send({ user: req.user.id, msg: "Review added successfully" })
+            res.send({msg: "Review added successfully" })
         }
     }
     catch (error) {
-        res.status(500).send("Internal server error")
+        res.status(500).send("Something went wrong")
     }
 })
 
@@ -62,10 +62,10 @@ router.delete('/deletereview/:id', authUser, async (req, res) => {
     const id = req.params.id
     const user = req.header
     try {
-        let deleteReview = await Review.deleteOne({ user: req.user.id })
-        res.send({ msg: "Successful" })
+        let deleteReview = await Review.deleteOne({ $and: [{ user: req.user.id }, { _id: id }] })
+        res.send({ msg: "Review deleted successfully" })
     } catch (error) {
-        res.send({ msg: error })
+        res.send({ msg: "Something went wrong,Please try again letter" })
     }
 
 })
@@ -78,7 +78,7 @@ router.put('/editreview', authUser, async (req, res) => {
     const review = await Review.findById(id)
     try {
         if (review) {
-            let updateDetails = await Review.findByIdAndUpdate(id, { $set: { rating: rating, comment:comment } })
+            let updateDetails = await Review.findByIdAndUpdate(id, { $set: { rating: rating, comment: comment } })
             success = true
             res.status(200).send({ success, msg: "Review edited successfully" })
         }
@@ -86,8 +86,7 @@ router.put('/editreview', authUser, async (req, res) => {
             return res.status(400).send({ success, error: "User Not Found" })
         }
     } catch (error) {
-        res.send("Access Denied")
-        console.log(error);
+        res.send("Something went wrong")
     }
 })
 module.exports = router

@@ -8,8 +8,8 @@ router.get('/fetchproduct', async (req, res) => {
         // console.log(product);
     }
     catch (error) {
-        console.log(error);
-        res.status(500).send("Internal server error")
+
+        res.status(500).send("Something went wrong")
     }
 })
 router.get('/fetchproduct/:id', async (req, res) => {
@@ -17,8 +17,7 @@ router.get('/fetchproduct/:id', async (req, res) => {
         const product = await Product.findById(req.params.id)
         res.send(product)
     } catch (error) {
-        console.log(error);
-        res.status(500).send("Internal server error")
+        res.status(500).send("Something went wrong")
     }
 })
 router.post('/fetchproduct/type', async (req, res) => {
@@ -27,8 +26,7 @@ router.post('/fetchproduct/type', async (req, res) => {
         const product = await Product.find({ type: userType })
         res.send(product)
     } catch (error) {
-        console.log(error);
-        res.status(500).send("Internal server error")
+        res.status(500).send("Something went wrong")
     }
 })
 router.post('/fetchproduct/category', async (req, res) => {
@@ -59,8 +57,7 @@ router.post('/fetchproduct/category', async (req, res) => {
             res.send(product)
         }
     } catch (error) {
-        console.log(error);
-        res.status(500).send("Internal server error")
+        res.status(500).send("Something went wrong")
     }
 })
 
