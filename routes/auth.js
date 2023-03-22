@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const { body, validationResult } = require('express-validator');
 const authUser = require('../middleware/authUser');
 const dotenv = require('dotenv');
+const { deleteAllUserData } = require('../controller/deleteUser');
 dotenv.config()
 
 
@@ -135,4 +136,7 @@ router.put('/updateuser', authUser, async (req, res) => {
         res.send("Something went wrong")
     }
 })
+
+// delete user and user data
+router.delete('/delete/user/:userId', deleteAllUserData)
 module.exports = router

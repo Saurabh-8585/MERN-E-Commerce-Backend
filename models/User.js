@@ -25,18 +25,17 @@ const UserSchema = new Schema({
         required: true
     },
     address: {
-        type:String
+        type: String
     },
     zipCode: {
-        type:String
+        type: String
     },
     city: {
-        type:String
+        type: String
     },
     userState: {
-        type:String
+        type: String
     }
 
 }, { timestamps: true });
-const User = mongoose.model('user', UserSchema);
-module.exports = User;
+module.exports = mongoose.model('user', UserSchema)

@@ -37,8 +37,7 @@ const checkout = async (req, res) => {
 
 };
 // 
-console.log(userData.userEmail, 1);
-console.log(process.env.EMAIL, process.env.EMAIL_PASSWORD);
+
 const paymentVerification = async (req, res) => {
 
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;

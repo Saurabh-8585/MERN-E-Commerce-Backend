@@ -1,17 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product')
+
+// to fetch all products
 router.get('/fetchproduct', async (req, res) => {
     try {
         const product = await Product.find()
         res.send(product)
-        // console.log(product);
     }
     catch (error) {
 
         res.status(500).send("Something went wrong")
     }
 })
+// To get Single product
 router.get('/fetchproduct/:id', async (req, res) => {
     try {
         const product = await Product.findById(req.params.id)
@@ -20,6 +22,7 @@ router.get('/fetchproduct/:id', async (req, res) => {
         res.status(500).send("Something went wrong")
     }
 })
+// to get products for single category
 router.post('/fetchproduct/type', async (req, res) => {
     const { userType } = req.body
     try {
@@ -29,6 +32,7 @@ router.post('/fetchproduct/type', async (req, res) => {
         res.status(500).send("Something went wrong")
     }
 })
+// to get products category wise
 router.post('/fetchproduct/category', async (req, res) => {
     const { userType, userCategory } = req.body
     try {
@@ -60,6 +64,37 @@ router.post('/fetchproduct/category', async (req, res) => {
         res.status(500).send("Something went wrong")
     }
 })
+// to search products
+
+router.get('/search/:key', async (req, res) => {
+    const { key } = req.params
+    try {
+        if (key.length > 0) {
+            const product = await Product.find({
+                $or: [
+                    { name: { $regex: key } },
+                    { type: { $regex: key } },
+                    { brand: { $regex: key } },
+                    { category: { $regex: key } },
+                    { author: { $regex: key } },
+                    { description: { $regex: key } },
+                    { gender: { $regex: key } },
+                ]
+            })
+            if (product.length <= 0) {
+                res.status(400).send("Product not found")
+            }
+            else {
+                res.send(product)
+            }
+        }
+
+    } catch (error) {
+        res.status(400).send("Something went wrong")
+    }
+})
+
+
 
 
 module.exports = router

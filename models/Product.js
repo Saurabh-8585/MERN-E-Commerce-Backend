@@ -7,7 +7,10 @@ const ProductSchema = new Schema({
     category: String,
     image: String,
     rating: Number,
-    type: String
+    type: String,
+    author: String,
+    description: String,
+    gender: String,
 })
 
 module.exports = mongoose.model("product", ProductSchema)
