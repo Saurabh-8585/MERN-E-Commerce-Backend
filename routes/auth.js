@@ -138,5 +138,5 @@ router.put('/updateuser', authUser, async (req, res) => {
 })
 
 // delete user and user data
-router.delete('/delete/user/:userId', deleteAllUserData)
+router.delete('/delete/user/:userId', authUser, deleteAllUserData)
 module.exports = router

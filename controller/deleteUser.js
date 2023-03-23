@@ -14,7 +14,7 @@ const deleteAllUserData = async (req, res) => {
             const deleteReview = await Review.deleteMany({ user: userId });
             res.send("delete successfully")
         } catch (error) {
-            res.send(error)
+            res.send("Something went wrong")
         }
     }
     else {

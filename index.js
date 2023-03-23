@@ -42,7 +42,7 @@ app.use('/api/review', review)
 app.use('/api', paymentRoute)
 
 // forgot Password route
-app.use('/api/reset-password', forgotPassword)
+app.use('/api/password', forgotPassword)
 
 
 app.listen(port, () => {
