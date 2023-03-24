@@ -72,13 +72,13 @@ router.get('/search/:key', async (req, res) => {
         if (key.length > 0) {
             const product = await Product.find({
                 $or: [
-                    { name: { $regex: key } },
-                    { type: { $regex: key } },
-                    { brand: { $regex: key } },
-                    { category: { $regex: key } },
-                    { author: { $regex: key } },
-                    { description: { $regex: key } },
-                    { gender: { $regex: key } },
+                    { name: { $regex: key, $options: "i" } },
+                    { type: { $regex: key, $options: "i" } },
+                    { brand: { $regex: key, $options: "i" } },
+                    { category: { $regex: key, $options: "i" } },
+                    { author: { $regex: key, $options: "i" } },
+                    { description: { $regex: key, $options: "i" } },
+                    { gender: { $regex: key, $options: "i" } },
                 ]
             })
             if (product.length <= 0) {
