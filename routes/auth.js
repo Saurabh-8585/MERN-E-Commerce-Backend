@@ -23,11 +23,13 @@ router.post('/register', [
 
 ], async (req, res) => {
 
+    res.c
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+        
         return res.status(400).json({ error: errors.array() })
     }
-    const { firstName, lastName, email, phoneNumber, password } = req.body
+    const { firstName, lastName, email, phoneNumber, password,isAdmin } = req.body
 
     try {
         let user = await User.findOne({ $or: [{ email: email }, { phoneNumber: phoneNumber }] });
@@ -46,6 +48,7 @@ router.post('/register', [
             email,
             phoneNumber,
             password: secPass,
+            isAdmin
         })
         const data = {
             user: {
@@ -121,7 +124,6 @@ router.get('/getuser', authUser, async (req, res) => {
 router.put('/updateuser', authUser, async (req, res) => {
     const { userDetails } = req.body
     let convertData = JSON.parse(userDetails)
-    const user = req.header
     try {
         const user = await User.findById(req.user.id)
         if (user) {

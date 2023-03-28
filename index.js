@@ -9,6 +9,7 @@ const product = require('./routes/product')
 const review = require('./routes/review')
 const paymentRoute = require('./routes/paymentRoute')
 const forgotPassword = require('./routes/forgotPassword')
+const AdminRoute = require('./routes/Admin/AdminAuth')
 connectToMongo();
 
 const port = 5000
@@ -37,7 +38,7 @@ app.use('/api/cart', cart)
 app.use('/api/wishlist', wishlist)
 
 app.use('/api/review', review)
-
+app.use('/api/admin', AdminRoute)
 // payment route
 app.use('/api', paymentRoute)
 
