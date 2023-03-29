@@ -3,11 +3,13 @@ const jwt = require("jsonwebtoken");
 const User = require('../../models/User');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const authAdmin = require("../../middleware/authAdmin");
 const { body, validationResult } = require('express-validator');
-// const authUser = require('../middleware/authUser');
 const dotenv = require('dotenv');
-// const { deleteAllUserData } = require('../controller/deleteUser');
+const { getAllUsersInfo, getSingleUserInfo, getUserCart, getUserWishlist, getUserReview } = require('../../controller/getUserAllData');
 dotenv.config()
+
+
 let success = false
 let adminKey = "12345"
 router.post('/login', [
@@ -105,4 +107,9 @@ router.post('/register', [
         res.status(500).send("Internal server error")
     }
 })
+router.get('/getusers', authAdmin, getAllUsersInfo);
+router.get('/geteuser/:userId', authAdmin, getSingleUserInfo);
+router.get('/getcart/:userId', authAdmin, getUserCart);
+router.get('/getwishlist/:userId', authAdmin, getUserWishlist);
+router.get('/getreview/:userId', authAdmin, getUserReview);
 module.exports = router
