@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 const authAdmin = require("../../middleware/authAdmin");
 const { body, validationResult } = require('express-validator');
 const dotenv = require('dotenv');
-const { getAllUsersInfo, getSingleUserInfo, getUserCart, getUserWishlist, getUserReview } = require('../../controller/getUserAllData');
+const { getAllUsersInfo, getSingleUserInfo, getUserCart, getUserWishlist, getUserReview, deleteUserReview } = require('../../controller/getUserAllData');
 dotenv.config()
 
 
@@ -112,4 +112,5 @@ router.get('/geteuser/:userId', authAdmin, getSingleUserInfo);
 router.get('/getcart/:userId', authAdmin, getUserCart);
 router.get('/getwishlist/:userId', authAdmin, getUserWishlist);
 router.get('/getreview/:userId', authAdmin, getUserReview);
+router.delete('/review/:id/:userId', authAdmin, deleteUserReview);
 module.exports = router

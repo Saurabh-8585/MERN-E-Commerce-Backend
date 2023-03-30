@@ -11,7 +11,7 @@ const getAllUsersInfo = async (req, res) => {
 
     } catch (error) {
         console.log(error);
-        res.send(error);
+        res.status(400).send("User Not Found")
     }
 }
 const getSingleUserInfo = async (req, res) => {
@@ -19,7 +19,7 @@ const getSingleUserInfo = async (req, res) => {
     const findUser = await User.findById(userId)
     if (findUser) {
         try {
-            const findUser = await User.findById(userId);
+            const findUser = await User.findById(userId).select('-password');
             res.send(findUser);
         } catch (error) {
             res.send("Something went wrong")
@@ -75,7 +75,7 @@ const getUserReview = async (req, res) => {
 
             const findUserReview = await Review.find({ user: userId })
                 .populate("productId", " price image rating type")
-                .populate("user", "name email");;
+                .populate("user", "firstName lastName");;
             res.send(findUserReview);
         } catch (error) {
             res.send("Something went wrong")
@@ -86,4 +86,16 @@ const getUserReview = async (req, res) => {
     }
 
 }
-module.exports = { getAllUsersInfo, getSingleUserInfo, getUserCart, getUserWishlist, getUserReview }
+
+const deleteUserReview = async (req, res) => {
+    const { id, userId } = req.params
+    console.log(id,userId);
+    try {
+        let deleteReview = await Review.deleteOne({ $and: [{ user: userId }, { _id: id }] })
+        console.log(deleteReview);
+        res.send({ deleteReview, msg: "Review deleted successfully" })
+    } catch (error) {
+        res.send({ msg: "Something went wrong,Please try again letter" })
+    }
+}
+module.exports = { getAllUsersInfo, getSingleUserInfo, getUserCart, getUserWishlist, getUserReview, deleteUserReview }

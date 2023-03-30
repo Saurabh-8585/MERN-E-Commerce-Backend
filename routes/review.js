@@ -48,7 +48,7 @@ router.post('/addreview', authUser, async (req, res) => {
         else {
             const reviewData = new Review({ user: req.user.id, productId: id, comment: comment, rating: rating })
             const savedReview = await reviewData.save()
-            res.send({msg: "Review added successfully" })
+            res.send({ msg: "Review added successfully" })
         }
     }
     catch (error) {
@@ -59,8 +59,7 @@ router.post('/addreview', authUser, async (req, res) => {
 
 
 router.delete('/deletereview/:id', authUser, async (req, res) => {
-    const id = req.params.id
-    const user = req.header
+    const { id } = req.params
     try {
         let deleteReview = await Review.deleteOne({ $and: [{ user: req.user.id }, { _id: id }] })
         res.send({ msg: "Review deleted successfully" })
