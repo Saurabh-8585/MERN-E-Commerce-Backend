@@ -2,7 +2,7 @@ const User = require("../models/User");
 const Cart = require("../models/Cart");
 const Wishlist = require("../models/Wishlist");
 const Review = require("../models/Review");
-
+let success = false;
 const getAllUsersInfo = async (req, res) => {
     try {
         const data = await User.find().select('-password');
@@ -53,10 +53,7 @@ const getUserWishlist = async (req, res) => {
     const findUser = await User.findById(userId)
     if (findUser) {
         try {
-            const findUserWishlist = await Wishlist.find({ user: userId })
-                .populate("productId", "name price image rating type")
-                .populate("user", "name email");
-
+            const findUserWishlist = await Wishlist.find({ user: userId }).populate("productId")
             res.send(findUserWishlist);
         } catch (error) {
             res.send("Something went wrong")
@@ -74,8 +71,8 @@ const getUserReview = async (req, res) => {
         try {
 
             const findUserReview = await Review.find({ user: userId })
-                .populate("productId", " price image rating type")
-                .populate("user", "firstName lastName");;
+                .populate("productId", "name price image rating type")
+                .populate("user", "firstName lastName");
             res.send(findUserReview);
         } catch (error) {
             res.send("Something went wrong")
@@ -88,14 +85,40 @@ const getUserReview = async (req, res) => {
 }
 
 const deleteUserReview = async (req, res) => {
-    const { id, userId } = req.params
-    console.log(id,userId);
+    const { id } = req.params;
     try {
-        let deleteReview = await Review.deleteOne({ $and: [{ user: userId }, { _id: id }] })
-        console.log(deleteReview);
-        res.send({ deleteReview, msg: "Review deleted successfully" })
+        let deleteReview = await Review.findByIdAndDelete(id)
+        res.send({ msg: "Review deleted successfully" })
     } catch (error) {
-        res.send({ msg: "Something went wrong,Please try again letter" })
+        res.status(400).send({ msg: "Something went wrong,Please try again letter", error })
     }
 }
-module.exports = { getAllUsersInfo, getSingleUserInfo, getUserCart, getUserWishlist, getUserReview, deleteUserReview }
+
+
+const deleteUserCartItem = async (req, res) => {
+    const { id } = req.params;
+    try {
+        let deleteCart = await Cart.deleteOne({ productId: id })
+        success = true
+        res.send({ success, msg: "Review deleted successfully" })
+    } catch (error) {
+        res.status(400).send({ msg: "Something went wrong,Please try again letter" })
+    }
+}
+const deleteUserWishlistItem = async (req, res) => {
+    const { id } = req.params;
+    try {
+        let deleteCart = await Wishlist.deleteOne({ productId: id })
+        success = true
+        res.send({ success, msg: "Review deleted successfully" })
+    } catch (error) {
+        res.status(400).send({ msg: "Something went wrong,Please try again letter" })
+    }
+}
+
+module.exports = {
+    getAllUsersInfo, getSingleUserInfo,
+    getUserCart, getUserWishlist,
+    getUserReview, deleteUserReview,
+    deleteUserCartItem, deleteUserWishlistItem
+}
