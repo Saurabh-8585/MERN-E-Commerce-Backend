@@ -23,4 +23,3 @@ const deleteAllUserData = async (req, res) => {
 
 }
 module.exports = { deleteAllUserData }
-// 63fccf8519623487fd3e4164

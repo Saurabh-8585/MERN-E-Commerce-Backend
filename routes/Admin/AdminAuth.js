@@ -7,6 +7,7 @@ const authAdmin = require("../../middleware/authAdmin");
 const { body, validationResult } = require('express-validator');
 const dotenv = require('dotenv');
 const { getAllUsersInfo, getSingleUserInfo, getUserCart, getUserWishlist, getUserReview, deleteUserReview, deleteUserCartItem, deleteUserWishlistItem } = require('../../controller/getUserAllData');
+const { chartData } = require('../../controller/AllProductInfo');
 dotenv.config()
 
 
@@ -112,7 +113,11 @@ router.get('/geteuser/:userId', authAdmin, getSingleUserInfo);
 router.get('/getcart/:userId', authAdmin, getUserCart);
 router.get('/getwishlist/:userId', authAdmin, getUserWishlist);
 router.get('/getreview/:userId', authAdmin, getUserReview);
+
 router.delete('/review/:id', authAdmin, deleteUserReview);
 router.delete('/usercart/:id', authAdmin, deleteUserCartItem);
 router.delete('/userwishlist/:id', authAdmin, deleteUserWishlistItem);
+
+router.get('/chartdata', chartData);
+
 module.exports = router

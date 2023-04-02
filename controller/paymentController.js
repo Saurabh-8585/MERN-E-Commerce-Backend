@@ -883,7 +883,7 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
         userData,
         totalAmount
       });
-      const deleteCart = await Cart.deleteMany({ 'user': userInfo })
+      const deleteCart = await Cart.deleteMany({ user: userInfo })
    
       res.redirect(`${process.env.PAYMENT_SUCCESS}=${razorpay_payment_id}`);
     }

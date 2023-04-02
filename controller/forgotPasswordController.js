@@ -303,10 +303,6 @@ const sendEmailLink = async (req, res) => {
   else {
     return res.status(400).json({ msg: "User not found" })
   }
-
-
-
-
 }
 
 const setNewPassword = async (req, res) => {

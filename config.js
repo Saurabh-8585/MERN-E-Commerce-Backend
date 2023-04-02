@@ -4,14 +4,16 @@ dotenv.config()
 
 const URL = process.env.MONGO_URL
 mongoose.set('strictQuery', true)
-const connectToMongo = () => {
-    mongoose.connect(URL)
-        .then((c) => {
-            console.log(`Mongodb connect to: ${c.connection.host}`);
-        })
-        .catch((e) => {
-            console.log(e);
-        });
+const connectToMongo = async () => {
+    try {
+        let db = await mongoose.connect(URL)
+        console.log(db.connection.host);
+    } catch (error) {
+        console.log(error);
+    }
+
+    // const f = await User.find();
+    // console.log(f);
 }
 
 module.exports = connectToMongo;
