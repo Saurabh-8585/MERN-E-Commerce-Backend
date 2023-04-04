@@ -64,35 +64,35 @@ router.post('/fetchproduct/category', async (req, res) => {
         res.status(500).send("Something went wrong")
     }
 })
-// to search products
+// to search products added search filters on frontend so no need to create separate api for this
 
-router.get('/search/:key', async (req, res) => {
-    const { key } = req.params
-    try {
-        if (key.length > 0) {
-            const product = await Product.find({
-                $or: [
-                    { name: { $regex: key, $options: "i" } },
-                    { type: { $regex: key, $options: "i" } },
-                    { brand: { $regex: key, $options: "i" } },
-                    { category: { $regex: key, $options: "i" } },
-                    { author: { $regex: key, $options: "i" } },
-                    { description: { $regex: key, $options: "i" } },
-                    { gender: { $regex: key, $options: "i" } },
-                ]
-            })
-            if (product.length <= 0) {
-                res.status(400).send("Product not found")
-            }
-            else {
-                res.send(product)
-            }
-        }
+// router.get('/search/:key', async (req, res) => {
+//     const { key } = req.params
+//     try {
+//         if (key.length > 0) {
+//             const product = await Product.find({
+//                 $or: [
+//                     { name: { $regex: key, $options: "i" } },
+//                     { type: { $regex: key, $options: "i" } },
+//                     { brand: { $regex: key, $options: "i" } },
+//                     { category: { $regex: key, $options: "i" } },
+//                     { author: { $regex: key, $options: "i" } },
+//                     { description: { $regex: key, $options: "i" } },
+//                     { gender: { $regex: key, $options: "i" } },
+//                 ]
+//             })
+//             if (product.length <= 0) {
+//                 res.status(400).send("Product not found")
+//             }
+//             else {
+//                 res.send(product)
+//             }
+//         }
 
-    } catch (error) {
-        res.status(400).send("Something went wrong")
-    }
-})
+//     } catch (error) {
+//         res.status(400).send("Something went wrong")
+//     }
+// })
 
 
 
