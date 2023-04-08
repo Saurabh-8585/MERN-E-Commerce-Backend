@@ -5,6 +5,7 @@ const Product = require('../models/Product')
 // to fetch all products
 router.get('/fetchproduct', async (req, res) => {
     try {
+
         const product = await Product.find()
         res.send(product)
     }
@@ -17,6 +18,7 @@ router.get('/fetchproduct', async (req, res) => {
 router.get('/fetchproduct/:id', async (req, res) => {
     try {
         const product = await Product.findById(req.params.id)
+        
         res.send(product)
     } catch (error) {
         res.status(500).send("Something went wrong")

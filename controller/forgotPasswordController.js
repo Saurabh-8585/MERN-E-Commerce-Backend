@@ -145,15 +145,7 @@ const sendEmailLink = async (req, res) => {
         <tr>
           <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:60px 10px 10px;font-family:'Raleway',sans-serif;" align="left">
             
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-        <td style="padding-right: 0px;padding-left: 0px;" align="center">
-          
-          <img align="center" border="0" src="https://cdn.templates.unlayer.com/assets/1676547950700-Asset%201.png" alt="image" title="image" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 35%;max-width: 203px;" width="203" class="v-src-width v-src-max-width"/>
-          
-        </td>
-        </tr>
-        </table>
+        
         
           </td>
         </tr>
@@ -304,7 +296,15 @@ const sendEmailLink = async (req, res) => {
     return res.status(400).json({ msg: "User not found" })
   }
 }
-
+{/* <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+        <td style="padding-right: 0px;padding-left: 0px;" align="center">
+          
+          <img align="center" border="0" src="https://cdn.templates.unlayer.com/assets/1676547950700-Asset%201.png" alt="image" title="image" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 35%;max-width: 203px;" width="203" class="v-src-width v-src-max-width"/>
+          
+        </td>
+        </tr>
+        </table> */}
 const setNewPassword = async (req, res) => {
   const { newPassword } = req.body;
   const { id, token } = req.params;
@@ -899,4 +899,4 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_image_1 .v-
   }
 }
 
-module.exports = { sendEmailLink,  setNewPassword, resetPassword }
+module.exports = { sendEmailLink, setNewPassword, resetPassword }

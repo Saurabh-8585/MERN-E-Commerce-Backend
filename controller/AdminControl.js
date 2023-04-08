@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Cart = require("../models/Cart");
 const Wishlist = require("../models/Wishlist");
 const Review = require("../models/Review");
+const Product = require("../models/Product");
 let success = false;
 const getAllUsersInfo = async (req, res) => {
     try {
@@ -116,9 +117,36 @@ const deleteUserWishlistItem = async (req, res) => {
     }
 }
 
+
+const updateProductDetails = async (req, res) => {
+    const updateProduct = req.body.productDetails;
+    updateProduct.price = parseFloat(updateProduct.price);
+    updateProduct.rating = parseFloat(updateProduct.rating);
+    const { id } = req.params;
+    const product = await Product.findById(id)
+    if (product) {
+        try {
+            let update = await Product.findByIdAndUpdate(id, { $set: updateProduct })
+            success = true
+            const findType = await Product.find({ type: "book" }).distinct('category')
+
+            res.send({ success, msg: "Product updated successfully", findType })
+
+        } catch (error) {
+            // return res.status(400).send({ success, error: error })
+            return res.status(400).send(error)
+        }
+    }
+    else {
+        return res.status(400).send({ success, error: "Product not found" })
+    }
+
+}
+
 module.exports = {
     getAllUsersInfo, getSingleUserInfo,
     getUserCart, getUserWishlist,
     getUserReview, deleteUserReview,
-    deleteUserCartItem, deleteUserWishlistItem
+    deleteUserCartItem, deleteUserWishlistItem,
+    updateProductDetails
 }
