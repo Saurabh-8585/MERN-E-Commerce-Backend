@@ -868,7 +868,8 @@ table, td { color: #000000; } @media (max-width: 480px) { #u_content_heading_7 .
       }
       transport.sendMail(mailOptions, (error, info) => {
         if (error) {
-          res.send({ msg: error });
+          console.log(error);
+          // res.send({ msg: error });
         }
         else {
           return res.send({ success, msg: "Password Changed Successfully" })

@@ -12,7 +12,7 @@ const checkAdmin = async (req, res, next) => {
     try {
         const data = jwt.verify(token, process.env.JWT_SECRET)
         req.user = data.user
-        const checkAdmin = await User.findById(data.user.id)
+        const checkAdmin = await User.findById(req.user.id)
         if (checkAdmin.isAdmin == true) {
             next()
         }

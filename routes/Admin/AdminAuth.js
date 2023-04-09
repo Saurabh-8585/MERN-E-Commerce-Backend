@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 const authAdmin = require("../../middleware/authAdmin");
 const { body, validationResult } = require('express-validator');
 const dotenv = require('dotenv');
-const { getAllUsersInfo, getSingleUserInfo, getUserCart, getUserWishlist, getUserReview, deleteUserReview, deleteUserCartItem, deleteUserWishlistItem, updateProductDetails } = require('../../controller/AdminControl');
+const { getAllUsersInfo, getSingleUserInfo, getUserCart, getUserWishlist, getUserReview, deleteUserReview, deleteUserCartItem, deleteUserWishlistItem, updateProductDetails, userPaymentDetails } = require('../../controller/AdminControl');
 const { chartData } = require('../../controller/AllProductInfo');
 dotenv.config()
 
@@ -114,6 +114,7 @@ router.get('/getcart/:userId', authAdmin, getUserCart);
 router.get('/getwishlist/:userId', authAdmin, getUserWishlist);
 router.get('/getreview/:userId', authAdmin, getUserReview);
 
+router.get('/getorder/:id', authAdmin, userPaymentDetails);
 
 
 router.put('/updateproduct/:id',authAdmin,updateProductDetails)
