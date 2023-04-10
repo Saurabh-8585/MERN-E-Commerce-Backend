@@ -146,7 +146,7 @@ const updateProductDetails = async (req, res) => {
 
 const userPaymentDetails = async (req, res) => {
     const { id } = req.params;
-    const findPayment = await Payment.find({ user: id });
+    const findPayment = await Payment.find({ user: id }).select("-productData.user");
     if (findPayment) {
         try {
             res.send(findPayment)

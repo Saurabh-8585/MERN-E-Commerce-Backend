@@ -113,7 +113,6 @@ router.get('/geteuser/:userId', authAdmin, getSingleUserInfo);
 router.get('/getcart/:userId', authAdmin, getUserCart);
 router.get('/getwishlist/:userId', authAdmin, getUserWishlist);
 router.get('/getreview/:userId', authAdmin, getUserReview);
-
 router.get('/getorder/:id', authAdmin, userPaymentDetails);
 
 
