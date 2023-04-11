@@ -20,7 +20,7 @@ router.get("/fetchcart", authUser, async (req, res) => {
 router.post("/addcart", authUser, async (req, res) => {
     try {
         const { _id, quantity } = req.body;
-        const findProduct = await Cart.findOne({$and: [{ productId: _id }, { user: req.user.id }] })
+        const findProduct = await Cart.findOne({ $and: [{ productId: _id }, { user: req.user.id }] })
         if (findProduct) {
             return res.status(400).json({ msg: "Product already in a cart" })
         }
@@ -41,8 +41,9 @@ router.post("/addcart", authUser, async (req, res) => {
 
 // remove from cart
 router.delete("/deletecart/:id", authUser, async (req, res) => {
+    const { id } = req.params;
     try {
-        const result = await Cart.deleteOne({ $and: [{ productId: req.params.id }, { user: req.user.id }] });
+        const result = await Cart.findByIdAndDelete(id)
         res.send(result);
     } catch (error) {
         res.status(500).send("Internal server error");

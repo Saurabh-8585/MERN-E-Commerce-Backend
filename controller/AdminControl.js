@@ -100,17 +100,18 @@ const deleteUserReview = async (req, res) => {
 const deleteUserCartItem = async (req, res) => {
     const { id } = req.params;
     try {
-        let deleteCart = await Cart.deleteOne({ productId: id })
+        let deleteCart = await Cart.findByIdAndDelete(id)
         success = true
         res.send({ success, msg: "Review deleted successfully" })
     } catch (error) {
-        res.status(400).send({ msg: "Something went wrong,Please try again letter" })
+        res.status(400).send({ msg: "Something went wrong,Please try again letter1" })
     }
 }
 const deleteUserWishlistItem = async (req, res) => {
     const { id } = req.params;
+    console.log(id);
     try {
-        let deleteCart = await Wishlist.deleteOne({ productId: id })
+        let deleteCart = await Wishlist.findByIdAndDelete(id)
         success = true
         res.send({ success, msg: "Review deleted successfully" })
     } catch (error) {
