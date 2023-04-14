@@ -159,10 +159,41 @@ const userPaymentDetails = async (req, res) => {
         return res.status(400).send({ total: 0 })
     }
 }
+
+const addProduct = async (req, res) => {
+    const { name, brand, price, category, image, rating, type, author, description, gender } = req.body;
+    try {
+        await Product.create({ name, brand, price, category, image, rating, type, author, description, gender })
+        success = true
+        res.send(success)
+
+    } catch (error) {
+        console.log(error);
+        return res.status(400).send(error)
+    }
+}
+
+const deleteProduct = async (req, res) => {
+    const { id } = req.params;
+    let findProduct = await Product.findById(id);
+    if (findProduct) {
+        try {
+            await Product.findByIdAndDelete(id)
+            success = true
+            res.send(success)
+        } catch (error) {
+            return res.status(400).send(error)
+        }
+    }
+    else {
+        return res.status(400).send({ success, msg: "Product Not Found" })
+    }
+}
+
 module.exports = {
     getAllUsersInfo, getSingleUserInfo,
     getUserCart, getUserWishlist,
     getUserReview, deleteUserReview,
     deleteUserCartItem, deleteUserWishlistItem,
-    updateProductDetails, userPaymentDetails
+    updateProductDetails, userPaymentDetails, addProduct, deleteProduct
 }

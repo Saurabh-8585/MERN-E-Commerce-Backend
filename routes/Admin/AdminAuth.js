@@ -6,13 +6,21 @@ const bcrypt = require('bcrypt');
 const authAdmin = require("../../middleware/authAdmin");
 const { body, validationResult } = require('express-validator');
 const dotenv = require('dotenv');
-const { getAllUsersInfo, getSingleUserInfo, getUserCart, getUserWishlist, getUserReview, deleteUserReview, deleteUserCartItem, deleteUserWishlistItem, updateProductDetails, userPaymentDetails } = require('../../controller/AdminControl');
+const { getAllUsersInfo, getSingleUserInfo, getUserCart, getUserWishlist, getUserReview, deleteUserReview, deleteUserCartItem, deleteUserWishlistItem, updateProductDetails, userPaymentDetails, addProduct, deleteProduct } = require('../../controller/AdminControl');
 const { chartData } = require('../../controller/AllProductInfo');
 dotenv.config()
 
 
 let success = false
-let adminKey = "12345"
+let adminKey = process.env.ADMIN_KEY
+router.get('/getusers', authAdmin, getAllUsersInfo);
+router.get('/geteuser/:userId', authAdmin, getSingleUserInfo);
+router.get('/getcart/:userId', authAdmin, getUserCart);
+router.get('/getwishlist/:userId', authAdmin, getUserWishlist);
+router.get('/getreview/:userId', authAdmin, getUserReview);
+router.get('/getorder/:id', authAdmin, userPaymentDetails);
+router.get('/chartdata', chartData);
+
 router.post('/login', [
     body('email', 'Enter a valid email').isEmail(),
     body('password', 'Password cannot be blank').exists(),
@@ -64,8 +72,6 @@ router.post('/register', [
 
 
 ], async (req, res) => {
-
-    res.c
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
 
@@ -108,21 +114,18 @@ router.post('/register', [
         res.status(500).send("Internal server error")
     }
 })
-router.get('/getusers', authAdmin, getAllUsersInfo);
-router.get('/geteuser/:userId', authAdmin, getSingleUserInfo);
-router.get('/getcart/:userId', authAdmin, getUserCart);
-router.get('/getwishlist/:userId', authAdmin, getUserWishlist);
-router.get('/getreview/:userId', authAdmin, getUserReview);
-router.get('/getorder/:id', authAdmin, userPaymentDetails);
+router.post('/addproduct', authAdmin, addProduct);
 
 
-router.put('/updateproduct/:id',authAdmin,updateProductDetails)
+
+router.put('/updateproduct/:id', authAdmin, updateProductDetails)
+
 
 
 router.delete('/review/:id', authAdmin, deleteUserReview);
 router.delete('/usercart/:id', authAdmin, deleteUserCartItem);
 router.delete('/userwishlist/:id', authAdmin, deleteUserWishlistItem);
+router.delete('/deleteproduct/:id', authAdmin, deleteProduct);
 
-router.get('/chartdata', chartData);
 
 module.exports = router
