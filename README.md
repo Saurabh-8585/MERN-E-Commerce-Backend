@@ -1,12 +1,17 @@
+## Live Link
+
+You can access the live application at [https://e-shopit.vercel.app/](https://e-shopit.vercel.app/).
+
 # MERN-E-Commerce-Backend
 
 MERN-E-Commerce-Backend is the backend of an e-commerce web application built with MongoDB, NodeJS, and ExpressJS.
 
+The frontend of the application is built with ReactJS,React-router-dom,ContextAPI. The source code for the frontend can be found at [https://github.com/Saurabh-8585/MERN-E-Commerce-Frontend](https://github.com/Saurabh-8585/MERN-E-Commerce-Frontend).
+
 ## Features
 
-
 - User authentication and authorization(JWT)
-- Admin dashboard for managing products, orders, and users
+- Admin dashboard for managing products, orders, users and to show statistics
 - Payemnt Gateway
 - Mail Service
 - Forgot Password & Reset Password
@@ -16,7 +21,7 @@ MERN-E-Commerce-Backend is the backend of an e-commerce web application built wi
 - Order history 
 
 ## Tech Stack
-
+- ReactJS
 - MongoDB
 - NodeJS
 - ExpressJS
@@ -41,8 +46,8 @@ To run the backend server on your local machine, follow these steps:
 3. Set up the environment variables by creating a `.env` file in the root directory and adding the following variables:
 
    ```
-   MONGO_URL=<your_mongodb_uri>
-   JWT_SECRET=<your_jwt_secret>
+   MONGO_URL
+   JWT_SECRET
    RAZORPAY_API_KEY
    RAZORPAY_API_SECRET
    EMAIL
@@ -56,7 +61,7 @@ To run the backend server on your local machine, follow these steps:
 4. Start the development server:
 
    ```
-   npm start
+   npm run server
    ```
 
 ## Contributing
