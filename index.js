@@ -2,6 +2,8 @@ const connectToMongo = require('./config');
 const bodyParser = require('body-parser')
 const express = require('express')
 const cors = require('cors')
+const path = require('path');
+
 const auth = require('./routes/auth');
 const cart = require('./routes/cart')
 const wishlist = require('./routes/wishlist')
@@ -26,7 +28,11 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use(express.json())
 app.use(cors());
+app.use(express.static(path.join(__dirname, 'build')));
 
+app.get('/', function (req, res) {
+    res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+});
 
 // Available Routes
 app.use('/api/auth', auth)
