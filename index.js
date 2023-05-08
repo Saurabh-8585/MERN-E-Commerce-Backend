@@ -12,6 +12,9 @@ const review = require('./routes/review')
 const paymentRoute = require('./routes/paymentRoute')
 const forgotPassword = require('./routes/forgotPassword')
 const AdminRoute = require('./routes/Admin/AdminAuth')
+const dotenv = require('dotenv');
+dotenv.config()
+
 connectToMongo();
 
 const port = 5000
@@ -30,9 +33,9 @@ app.use(express.json())
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'build')));
 
-app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
-});
+// app.get('/', function (req, res) {
+//     res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+// });
 
 // Available Routes
 app.use('/api/auth', auth)
@@ -50,7 +53,7 @@ app.use('/api', paymentRoute)
 
 // forgot Password route
 app.use('/api/password', forgotPassword)
-
+app.use(cors());
 
 app.listen(port, () => {
     console.log(`E-commerce backend listening at http://localhost:${port}`)

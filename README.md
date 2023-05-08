@@ -65,7 +65,7 @@ To run the backend server on your local machine, follow these steps:
    npm install
    ```
 
-3. Set up the environment variables by creating a `.env` file in the root directory and adding the following variables:
+<!-- 3. Set up the environment variables by creating a `.env` file in the root directory and adding the following variables:
 
    ```
    MONGO_URL:"your db url"
@@ -78,9 +78,9 @@ To run the backend server on your local machine, follow these steps:
    FORGOT_PASSWORD=http://localhost:3000/user/reset
    GO_TO_CART=http://localhost:3000/cart
 
-   ```
+   ``` -->
 
-4. Start the development server:
+3. Start the development server:
 
    ```
    npm run server
