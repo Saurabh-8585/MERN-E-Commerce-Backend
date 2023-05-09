@@ -14,8 +14,8 @@ dotenv.config()
 let success = false
 router.post('/register', [
 
-    body('firstName', 'Enter a valid name').isLength({ min: 3 }),
-    body('lastName', 'Enter a valid name').isLength({ min: 3 }),
+    body('firstName', 'Enter a valid name').isLength({ min: 1 }),
+    body('lastName', 'Enter a valid name').isLength({ min: 1 }),
     body('email', 'Enter a valid email').isEmail(),
     body('password', 'Password must be at least 5 characters').isLength({ min: 5 }),
     body('phoneNumber', 'Enter a valid phone number').isLength({ min: 10, max: 10 })

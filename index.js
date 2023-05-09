@@ -53,7 +53,6 @@ app.use('/api', paymentRoute)
 
 // forgot Password route
 app.use('/api/password', forgotPassword)
-app.use(cors());
 
 app.listen(port, () => {
     console.log(`E-commerce backend listening at http://localhost:${port}`)
