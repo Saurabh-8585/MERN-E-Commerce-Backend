@@ -8,7 +8,6 @@ let success = false;
 const getAllUsersInfo = async (req, res) => {
     try {
         const data = await User.find().select('-password');
-        // console.log(data);
         res.send(data)
 
     } catch (error) {

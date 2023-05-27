@@ -53,11 +53,13 @@ router.post('/login', [
         }
 
         else {
+            success = false
             return res.status(400).send({ success, error: "Invalid User" })
         }
 
     }
     catch (error) {
+        success = false
         res.status(500).send("Internal server error002")
     }
 }
@@ -82,11 +84,13 @@ router.post('/register', [
     try {
         let user = await User.findOne({ $or: [{ email: email }, { phoneNumber: phoneNumber }] });
         if (user) {
-            return res.status(400).send({ error: "Sorry a user already exists" })
+            success = false
+            return res.status(400).send({success, error: "Sorry a user already exists" })
         }
 
-        if (key != adminKey) {
-            return res.status(400).send({ error: "Invalid User" })
+        if (key !== adminKey) {
+            success = false
+            return res.status(400).send({ success, error: "Invalid User" })
         }
         // password hashing
         const salt = await bcrypt.genSalt(10)
